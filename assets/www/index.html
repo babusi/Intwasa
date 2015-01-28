@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Intwasa Festival App</title>
+
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/idangerous.swiper.css">
+    <link href="css/wetu.css" rel="stylesheet">
+    <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+	<script type="text/javascript" src="cordova.js"></script>
+	<script type="text/javascript" src="js/html2canvas.js"></script>
+    <script type="text/javascript" src="js/SocialSharing.js"></script>
+    <script src="js/modernizr.custom.js"></script>
+    <script type="text/javascript" charset="utf-8">
+
+    var pictureSource;   // picture source
+    var destinationType; // sets the format of returned value 
+
+    // Wait for Cordova to connect with the device
+    //
+    document.addEventListener("deviceready",onDeviceReady,false);
+
+    // Cordova is ready to be used!
+    //
+	
+	
+    function onDeviceReady() {
+        pictureSource=navigator.camera.PictureSourceType;
+        destinationType=navigator.camera.DestinationType;
+///////////////////////////
+    }
+	
+	function capture() {
+	$('.rotate').hide();
+	html2canvas([document.getElementById("coolpic")], {
+		logging: true,
+		onrendered: function(canvas) {
+            //get a drawing context from canvas
+            var context = canvas.getContext("2d");
+            //convert canvas data to an image data url
+            var imgDataUrl = canvas.toDataURL();
+            //share the image via phonegap plugin
+            window.plugins.socialsharing.share(
+                '#Intwasa14',
+                'Intwasa!',
+                imgDataUrl,
+                '',
+                function(){ 
+                    //success callback
+                },
+                function(err){
+                    //error callback
+                    console.error('error in share', err)
+                }
+            );
+			
+		}
+	});
+    return false;
+}
+
+    // Called when a photo is successfully retrieved
+    //
+    function onPhotoDataSuccess(imageData) {
+      // Uncomment to view the base64 encoded image data
+      // console.log(imageData);
+
+      // Get image handle
+      //
+	  $('.rotate').show();
+	  $('#reset').hide();
+      var smallImage = document.getElementById('smallImage');
+
+      // Unhide image elements
+      //
+      smallImage.style.display = 'block';
+
+      // Show the captured photo
+      // The inline CSS rules are used to resize the image
+      //
+      smallImage.src = "data:image/jpeg;base64," + imageData;
+    }
+
+    // Called when a photo is successfully retrieved
+    //
+    function onPhotoURISuccess(imageURI) {
+      // Uncomment to view the image file URI 
+      // console.log(imageURI);
+
+      // Get image handle
+      //
+      var largeImage = document.getElementById('largeImage');
+
+      // Unhide image elements
+      //
+      largeImage.style.display = 'block';
+
+      // Show the captured photo
+      // The inline CSS rules are used to resize the image
+      //
+      largeImage.src = imageURI;
+    }
+
+    // A button will call this function
+    //
+    function capturePhoto() {
+      // Take picture using device camera and retrieve image as base64-encoded string
+      navigator.camera.getPicture(onPhotoDataSuccess, onFail, { quality: 50,
+        destinationType: destinationType.DATA_URL });
+    }
+
+    // A button will call this function
+    //
+    function capturePhotoEdit() {
+      // Take picture using device camera, allow edit, and retrieve image as base64-encoded string  
+      navigator.camera.getPicture(onPhotoDataSuccess, onFail, { quality: 20, allowEdit: true,
+        destinationType: destinationType.DATA_URL });
+    }
+
+    // A button will call this function
+    //
+    function getPhoto(source) {
+      // Retrieve image file location from specified source
+      navigator.camera.getPicture(onPhotoURISuccess, onFail, { quality: 50, 
+        destinationType: destinationType.FILE_URI,
+        sourceType: source });
+    }
+
+    // Called if something bad happens.
+    // 
+    function onFail(message) {
+      alert('Eish! Failed because: ' + message);
+    }
+	
+
+    </script>
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+  	<div class="container-fluid">
+    	<div class="row main">
+        	<div class="header">
+            	<span>Intwasa Arts Festival</span>
+            </div>
+             <ul class="nav nav-tabs" role="tablist" id="myTab">
+              <li class="active"><a href="#feed" role="tab" data-toggle="tab"><i class="fa fa-newspaper-o"></i> Newsfeed </a></li>
+              <li><a href="#myevents" role="tab" data-toggle="tab"><i class="fa fa-camera"></i> Photo Booth</a></li>
+              <li><a href="#programme" role="tab" data-toggle="tab"><i class="fa fa-file-text-o"></i> Programme</a></li>
+              <li><a href="#eventmap" role="tab" data-toggle="tab"><i class="fa fa-map-marker"></i> Map</a></li>
+            </ul>
+        	<div class="tab-content">
+              <div class="tab-pane in active" id="feed">
+              
+              <ul class="list-group feed"></ul>
+				  <script type="text/html" id="entryTmpl">
+                          <li class="list-group-item <!=source!> entry">
+						  	<div class="row">
+								<div class="col-xs-12">
+									<div class="source"><i class="src fa fa-<!=source!>"></i></div>
+									<div class="content"><!=content!></div>
+								</div>
+							</div>
+                          </li>
+                  </script>
+              </div>
+              <div class="tab-pane" id="myevents">
+              	<div class="col-xs-12">
+                <div id="coolpic">
+                	<img style="display:none;" id="smallImage" src="" />
+                	<img class="wtmk" src="img/intwasa-wm.png"/>
+                    <button class="rotate" id="rot-left"><i class="fa fa-rotate-left"></i> Rotate left</button>
+                    <button class="rotate" id="reset"><i class="fa fa-remove"></i></button>
+                    <button class="rotate" id="rot-right"> Rotate right <i class="fa fa-rotate-right"></i></button>
+                </div>
+                
+              	<button class="btn take" id="selfie"  onclick="capturePhoto();"><i class=" fa fa-camera-retro"></i> Take a photo</button>
+                <button class="btn save" onclick="capture();"><i class="fa fa-share-alt"></i> Share!</button>
+                </div>
+              </div>
+              <div class="tab-pane" id="programme">
+              <div class="swiper-container">
+                <div class="swiper-wrapper">
+                  <div class="swiper-slide">
+                    <div class="title">Tuesday 23 Sep 2014</div>
+                  	<ul class="list-group eventslist tuesday">                  
+                	</ul>
+                  </div>
+                  <div class="swiper-slide">
+                    <div class="title">Wednesday 24 Sep 2014</div>
+                  	<ul class="list-group eventslist wednesday">                  
+                	</ul>
+                  </div>
+                  <div class="swiper-slide">
+                    <div class="title">Thursday 25 Sep 2014</div>
+                  	<ul class="list-group eventslist thursday">                  
+                	</ul>
+                  </div>
+                  <div class="swiper-slide">
+                    <div class="title">Friday 26 Sep 2014</div>
+                  	<ul class="list-group eventslist friday">                  
+                	</ul>
+                  </div>
+                  <div class="swiper-slide">
+                    <div class="title">Saturday 24 Sep 2014</div>
+                  	<ul class="list-group eventslist saturday">                  
+                	</ul>
+                  </div>
+                </div>
+              </div>
+              <a class="arrow-left" href="#"><i class="fa fa-angle-left"></i></a> 
+    		  <a class="arrow-right" href="#"><i class="fa fa-angle-right"></i></a>
+              	
+                
+                <script id="lineup-temp" type="text/x-handlebars-template">
+				  {{#each posts}}
+					<li class="list-group-item {{categories.1.slug}} {{categories.0.slug}} id-{{id}}">
+                      <a href="single.html?{{@index}}">
+                          <div class="row">
+                              <div class="col-xs-3">
+                                  <img src="{{ thumbnail_images.thumbnail.url }}"/>
+                              </div>
+                              <div class="col-xs-7">
+                                  <div class="row">
+                                      <div class="col-xs-12">
+                                          <h3>{{{ title }}}</h3>
+                                      </div>
+                                  </div>
+                                  <div class="row">
+									  <div class="col-xs-12">
+										  <span><i class="fa fa-clock-o"></i> {{{ custom_fields.time }}} </span>
+										  <span><i class="fa fa-map-marker"></i> {{{ custom_fields.location }}} </span>
+									  </div>
+								  </div>
+                              </div>
+                              <div class="col-xs-2">
+                              </div>
+                          </div>
+                      </a>
+                  	</li>
+				  {{/each}}
+				</script>
+        
+              </div>
+              <div class="tab-pane" id="eventmap">
+              	<div id="map-canvas"></div>
+              </div>              
+            </div>
+              
+              <div class="add">
+              	<a href="#myevents" role="tab" data-toggle="tab">
+                	<i class="fa fa-camera"></i>
+                </a>
+              </div>
+        </div>
+    </div>
+	<div id="loader">
+    </div>
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="http://code.jquery.com/ui/1.11.1/jquery-ui.js"></script>
+    <script src="js/jquery.ui.touch-punch.min.js"></script>
+    <script src="https://jqueryrotate.googlecode.com/files/jQueryRotateCompressed.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="js/handlebars-1.0.rc.2.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/jquery.feeds.min.js"></script>
+	<script src="http://cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.2/moment.min.js"></Script>
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
+	<script src="js/wetu.js"></script>
+    <script type="text/javascript">        
+        app.blog();
+    </script>
+    <script src="js/idangerous.swiper.min.js"></script>
+    <script>
+    var isSliderActive = false;
+	$('#myTab a').click(function (e) {
+	  e.preventDefault();
+		$(this).tab('show');
+		google.maps.event.trigger(map, 'resize');
+		map.setCenter(new google.maps.LatLng(-20.154464, 28.584298));
+		if($(this).attr('href') == "#programme"){
+			if(isSliderActive === false){
+			   var mySwiper = new Swiper('.swiper-container',{
+				  loop:false,
+				  grabCursor: true
+				})
+				$('.arrow-left').on('click', function(e){
+				  e.preventDefault()
+				  mySwiper.swipePrev()
+				})
+				$('.arrow-right').on('click', function(e){
+				  e.preventDefault()
+				  mySwiper.swipeNext()
+				})
+			}
+		   isSliderActive = true;
+		}    
+	});
+    </script>
+    <script>
+    	$( "#smallImage" ).draggable({ snap: "#coolpic"});
+    </script>
+    <script>
+    	$( document ).ready(function() {
+			$( "#loader" ).delay(2000).fadeOut(200);
+		  });
+    </script>
+  </body>
+</html>
